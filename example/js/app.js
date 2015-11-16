@@ -16,6 +16,7 @@ angular
 
     $scope.vimeoSettings = {
       haltInit: true,
+      src: '76979871',
       method: {},
       event: {
         play: function() {

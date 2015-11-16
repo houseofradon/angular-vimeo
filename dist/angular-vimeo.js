@@ -2,7 +2,7 @@
  * angular-vimeo
  * Philip Knape <philip.knape@gmail.com>
  * 
- * Version:  - 2015-11-16T12:55:08.391Z
+ * Version:  - 2015-11-16T13:28:15.697Z
  * License: ISC
  */
 
@@ -84,15 +84,14 @@
           var vimeoElement = angular.element(element)[0];
           angular.element(element).css('display', 'none');
 
-          var iframe = '<iframe id="{{iframeId}}" src="https://player.vimeo.com/video/76979871"></iframe>';
           var vimeoVideo, options;
           var playerOrigin = '*';
 
           function initOptions() {
            options = angular.extend(angular.copy(ngVimeoConfig), {
               responsive: scope.responsive || true,
-              iframeId: scope.id || 'vimeoPlayer',
-              url: scope.url,
+              id: scope.id || 'vimeoPlayer',
+              src: scope.src,
               type: scope.type || 'js',
               width: scope.width,
               height: scope.height,
@@ -100,9 +99,13 @@
             }, scope.settings);
           }
 
-          function buildIframe() {
-            var iframeOptions = ['id', 'fullscreen'];
-            var iframe = '<iframe id="{{ifrane.Id}}"></iframe>';
+          function buildIframe(opt) {
+            opt.src = 'https://player.vimeo.com/video/' + opt.src
+            var iframeOptions = ['id', 'src'];
+            var vimeoSettings = iframeOptions.map(function(val, index) {
+              return val + '="' + opt[val] + '"';
+            }).join(' ');
+            return  '<iframe ' + vimeoSettings + '></iframe>';
           }
 
           function initFromMethod() {
@@ -129,12 +132,17 @@
             vimeoVideo = null;
           }
 
-          function init(init) {
+          function init(manualInit) {
 
             initOptions();
 
-            if (options.haltInit && !init) {
+            if (options.haltInit && !manualInit) {
               options.method.setup = initFromMethod;
+              return;
+            }
+
+            if (!options.src) {
+              console.warn('you need to supply a vimeo src');
               return;
             }
 
@@ -143,7 +151,7 @@
 
             $timeout(function() {
               //add the video to the iframe;
-              element.html(iframe);
+              element.html(buildIframe(options));
               vimeoVideo = $compile(element.contents())(scope);
             }, 0);
 
