@@ -2,158 +2,238 @@
  * angular-vimeo
  * Philip Knape <philip.knape@gmail.com>
  * 
- * Version:  - 2015-11-13T10:50:39.991Z
+ * Version:  - 2015-11-16T12:55:08.391Z
  * License: ISC
  */
 
 
-'use strict';
+(function(window, angular) {
+  'use strict';
 
-angular
-  .module('ngVimeo', [])
-  .config(['$sce', function($sce) {
-    $sce.getTrustedResourceUrl('http://player.vimeo.com/video/*');
-  }])
-  .factory('VimeoService', function ($http) {
-    var endpoint = 'https://www.vimeo.com/api/oembed.json';
-    return {
-      oEmbed: function (params) {
-        return $http.jsonp(endpoint, {params: params}).then(function(res) {
-          return res.data;
-        });
-      }
-    };
-  })
-  .constant('ngVimeoConfig', {
-    methods: {},
-    events: {}
-  })
-  .directive('vimeo', ['ngVimeoConfig', '$window', '$timeout', function(ngVimeoConfig, $window, $timeout) {
-
-    var vimeoEvents = [
-      'ready',
-      'loadProgress',
-      'playProgress',
-      'play',
-      'pause',
-      'finish',
-      'seek'
-    ];
-
-    var vimeoMethods = [
-      'play', //play():void
-      'pause', //pause():void
-      'paused', //paused():Boolean
-      'seekTo', //seekTo(seconds:Number):void
-      'unload', //unload():void
-      'getCurrentTime', //getCurrentTime():number
-      'getDuration', //getDuration():number
-      'getVideoEmbedCode', //getVideoEmbedCode():string
-      'getVideoHeight', //getVideoHeight():Number
-      'getVideoWidth', //getVideoWidth():Number
-      'getVideoUrl', //getVideoUrl():String
-      'getColor', //getColor():String
-      'setColor', //setColor(color:String):void
-      'setLoop', //setLoop(loop:Boolean):void
-      'getVolume', //getVolume():Number
-      'setVolume', //setVolume(volume:Number):void
-      'addEventListener' //addEventListener(event:String, listener:String):void
-    ];
-
-    return {
-      restrict: 'AE',
-      scope: {
-        settings: '',
-        id: '@',
-        url: '@',
-        type: '@',
-        width: '@',
-        height: '@',
-        options: '@'
-      },
-      link: function(scope, element, attrs) {
-
-        var iframe = '<iframe id="player"></iframe>';
-        var options;
-
-        function initOptions() {
-         options = angular.extend(angular.copy(ngVimeoConfig), {
-            responsive: scope.responsive || true,
-            id: scope.id,
-            url: scope.url,
-            type: scope.type || 'js',
-            width: scope.width,
-            height: scope.height,
-            options: scope.options,
-          }, scope.settings);
+  angular
+    .module('ngVimeo', [])
+    /*.config(['$sce', function($sce) {
+      $sce.getTrustedResourceUrl('http://player.vimeo.com/video/*');
+    }])*/
+    .factory('VimeoService', function ($http) {
+      var endpoint = 'https://www.vimeo.com/api/oembed.json';
+      return {
+        oEmbed: function (params) {
+          return $http.jsonp(endpoint, {params: params}).then(function(res) {
+            return res.data;
+          });
         }
+      };
+    })
+    .constant('ngVimeoConfig', {
+      method: {},
+      event: {}
+    })
+    .directive('vimeo', [
+      'ngVimeoConfig',
+      '$window',
+      '$timeout',
+      '$compile',
+      function(ngVimeoConfig, $window, $timeout, $compile) {
 
-        function destroy() {
+        var vimeoEventList = [
+        'loadProgress',
+        'playProgress',
+        'play',
+        'pause',
+        'finish',
+        'seek'
+      ];
 
-        }
+      var vimeoMethodList = [
+        'play', //play():void
+        'pause', //pause():void
+        'paused', //paused():Boolean
+        'seekTo', //seekTo(seconds:Number):void
+        'unload', //unload():void
+        'getCurrentTime', //getCurrentTime():number
+        'getDuration', //getDuration():number
+        'getVideoEmbedCode', //getVideoEmbedCode():string
+        'getVideoHeight', //getVideoHeight():Number
+        'getVideoWidth', //getVideoWidth():Number
+        'getVideoUrl', //getVideoUrl():String
+        'getColor', //getColor():String
+        'setColor', //setColor(color:String):void
+        'setLoop', //setLoop(loop:Boolean):void
+        'getVolume', //getVolume():Number
+        'setVolume', //setVolume(volume:Number):void
+        'addEventListener' //addEventListener(event:String, listener:String):void
+      ];
 
-        function init() {
+      return {
+        restrict: 'E',
+        replace: true,
+        template: '<div></div>',
+        scope: {
+          settings: '=',
+          iframeId: '@',
+          url: '@',
+          type: '@',
+          width: '@',
+          height: '@',
+          options: '@'
+        },
+        link: function(scope, element, attrs) {
 
-          initOptions();
+
           var vimeoElement = angular.element(element)[0];
+          angular.element(element).css('display', 'none');
 
+          var iframe = '<iframe id="{{iframeId}}" src="https://player.vimeo.com/video/76979871"></iframe>';
+          var vimeoVideo, options;
+          var playerOrigin = '*';
 
-          $timeout(function() {
-            //add the video to the iframe;
+          function initOptions() {
+           options = angular.extend(angular.copy(ngVimeoConfig), {
+              responsive: scope.responsive || true,
+              iframeId: scope.id || 'vimeoPlayer',
+              url: scope.url,
+              type: scope.type || 'js',
+              width: scope.width,
+              height: scope.height,
+              options: scope.options,
+            }, scope.settings);
+          }
 
-          }, 0);
+          function buildIframe() {
+            var iframeOptions = ['id', 'fullscreen'];
+            var iframe = '<iframe id="{{ifrane.Id}}"></iframe>';
+          }
 
-          if (options.resize) {
-            $window.on('resize', function() {
-              console.log('resize');
+          function initFromMethod() {
+            destroy();
+            init(true);
+          }
+
+          function destroyAndInit() {
+            destroy();
+            init();
+          }
+
+          function destroy() {
+
+            // we need to check if we have the vimeo element
+            if (!vimeoVideo) {
+              return;
+            }
+
+            attachDetachListeners(vimeoEventList, 'removeEventListener');
+            $window.removeEventListener('message', onMessageReceived, false);
+            vimeoElement.removeChild(vimeoVideo[0]);
+            angular.element(element).css('display', 'none');
+            vimeoVideo = null;
+          }
+
+          function init(init) {
+
+            initOptions();
+
+            if (options.haltInit && !init) {
+              options.method.setup = initFromMethod;
+              return;
+            }
+
+            options.method.destroy = destroy;
+            angular.element(element).css('display', 'block');
+
+            $timeout(function() {
+              //add the video to the iframe;
+              element.html(iframe);
+              vimeoVideo = $compile(element.contents())(scope);
+            }, 0);
+
+            if (options.resize) {
+              var debounce = false;
+              if (debounce !== false) {
+                $timeout.cancel(debounce);
+              }
+              debounce = $timeout(function() {
+                $window.on('resize', function() {
+                  console.log('resize');
+                }, 200);
+              });
+            }
+
+            // Lets add all methods fro mVimeoMethodList
+            setMethods(options.method);
+
+            // Lets add the global eventlitsener
+            $window.addEventListener('message', onMessageReceived, false);
+
+          }
+
+          function onMessageReceived(event) {
+            // Handle messages from the vimeo player only
+            if (!(/^https?:\/\/player.vimeo.com/).test(event.origin)) {
+              return false;
+            }
+
+            if (playerOrigin === '*') {
+              playerOrigin = event.origin;
+            }
+
+            var data = JSON.parse(event.data);
+
+            if (data.event === 'ready') {
+              attachDetachListeners(vimeoEventList, 'addEventListener');
+            }
+
+            if (typeof options.event[data.event] === 'function') {
+              return options.event[data.event]();
+            }
+          }
+
+          function post(action, value) {
+            var data = {
+              method: action,
+            };
+            if (value) {
+              data.value = value;
+            }
+            var message = JSON.stringify(data);
+            vimeoVideo[0].contentWindow.postMessage(message, playerOrigin);
+          }
+
+          function attachDetachListeners(methods, type) {
+            angular.forEach(methods, function(method, key) {
+                post(type, method);
             });
           }
 
-          // attach the events
-          if (typeof options.event.loadProgress === 'function') {
-            vimeoElement.addEventListener('loadProgress', function(event) {
-              options.event.loadProgress(event);
+          function setMethods(methods) {
+
+            scope.internalControl = methods || {};
+
+            // Method
+            vimeoMethodList.forEach(function (value) {
+              scope.internalControl[value] = function() {
+
+                var args;
+                args = Array.prototype.slice.call(arguments);
+                args.unshift(value);
+                post(value);
+
+              };
             });
+
           }
 
-          if (typeof options.event.playProgress === 'function') {
-            vimeoElement.addEventListener('playProgress', function(event) {
-              options.event.playProgress(event);
-            });
-          }
+          element.one('$destroy', function() {
+            return destroy();
+          });
 
-          if (typeof options.event.play !== 'undefined') {
-            vimeoElement.addEventListener('play', function(event) {
-              options.event.play(event);
-            });
-          }
+          scope.$watch('settings', function(settings) {
+            if (settings !== null && settings !== undefined) {
+              return destroyAndInit();
+            }
+          }, true);
 
-          if (typeof options.event.pause !== 'undefined') {
-            vimeoElement.addEventListener('pause', function(event) {
-              options.event.pause(event);
-            });
-          }
         }
-
-        function destroyAndInit() {
-          destroy();
-          init();
-        }
-
-        function methods() {
-
-        }
-
-        element.one('$destroy', function() {
-          return destroy();
-        });
-
-        scope.$watch('settings', function(newVal) {
-           if (newVal !== null && newVal !== undefined) {
-            return destroyAndInit();
-           }
-        }, true);
-
-      }
-    };
-  }]);
+      };
+    }]);
+})(window, window.angular);

@@ -20,9 +20,14 @@
       method: {},
       event: {}
     })
-    .directive('vimeo', ['ngVimeoConfig', '$window', '$timeout', '$compile', function(ngVimeoConfig, $window, $timeout, $compile) {
+    .directive('vimeo', [
+      'ngVimeoConfig',
+      '$window',
+      '$timeout',
+      '$compile',
+      function(ngVimeoConfig, $window, $timeout, $compile) {
 
-      var vimeoEventList = [
+        var vimeoEventList = [
         'loadProgress',
         'playProgress',
         'play',
@@ -66,6 +71,10 @@
         },
         link: function(scope, element, attrs) {
 
+
+          var vimeoElement = angular.element(element)[0];
+          angular.element(element).css('display', 'none');
+
           var iframe = '<iframe id="{{iframeId}}" src="https://player.vimeo.com/video/76979871"></iframe>';
           var vimeoVideo, options;
           var playerOrigin = '*';
@@ -87,14 +96,40 @@
             var iframe = '<iframe id="{{ifrane.Id}}"></iframe>';
           }
 
-          function destroy() {
-
+          function initFromMethod() {
+            destroy();
+            init(true);
           }
 
-          function init() {
+          function destroyAndInit() {
+            destroy();
+            init();
+          }
+
+          function destroy() {
+
+            // we need to check if we have the vimeo element
+            if (!vimeoVideo) {
+              return;
+            }
+
+            attachDetachListeners(vimeoEventList, 'removeEventListener');
+            $window.removeEventListener('message', onMessageReceived, false);
+            vimeoElement.removeChild(vimeoVideo[0]);
+            angular.element(element).css('display', 'none');
+            vimeoVideo = null;
+          }
+
+          function init(init) {
 
             initOptions();
-            var vimeoElement = angular.element(element)[0];
+
+            if (options.haltInit && !init) {
+              options.method.setup = initFromMethod;
+              return;
+            }
+
+            options.method.destroy = destroy;
             angular.element(element).css('display', 'block');
 
             $timeout(function() {
@@ -104,11 +139,21 @@
             }, 0);
 
             if (options.resize) {
-              $window.on('resize', function() {
-                console.log('resize');
+              var debounce = false;
+              if (debounce !== false) {
+                $timeout.cancel(debounce);
+              }
+              debounce = $timeout(function() {
+                $window.on('resize', function() {
+                  console.log('resize');
+                }, 200);
               });
             }
 
+            // Lets add all methods fro mVimeoMethodList
+            setMethods(options.method);
+
+            // Lets add the global eventlitsener
             $window.addEventListener('message', onMessageReceived, false);
 
           }
@@ -134,11 +179,6 @@
             }
           }
 
-          function destroyAndInit() {
-            destroy();
-            init();
-          }
-
           function post(action, value) {
             var data = {
               method: action,
@@ -162,11 +202,13 @@
 
             // Method
             vimeoMethodList.forEach(function (value) {
-              scope.internalControl[value] = function() {;
+              scope.internalControl[value] = function() {
+
                 var args;
                 args = Array.prototype.slice.call(arguments);
                 args.unshift(value);
                 post(value);
+
               };
             });
 
@@ -176,9 +218,8 @@
             return destroy();
           });
 
-          scope.$watch('settings', function(newVal) {
-            if (newVal !== null && newVal !== undefined) {
-              setMethods(newVal.method);
+          scope.$watch('settings', function(settings) {
+            if (settings !== null && settings !== undefined) {
               return destroyAndInit();
             }
           }, true);

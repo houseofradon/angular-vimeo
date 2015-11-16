@@ -1,5 +1,3 @@
-(function(window, angular) {
-
 'use strict';
 
 angular
@@ -15,7 +13,9 @@ angular
       });
   }])
   .controller('VimeoController', function($scope, $timeout) {
+
     $scope.vimeoSettings = {
+      haltInit: true,
       method: {},
       event: {
         play: function() {
