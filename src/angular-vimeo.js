@@ -20,7 +20,9 @@
       method: {},
       event: {}
     })
-    .directive('vimeo', [
+    .constant('playerBaseURI', 'https://player.vimeo.com/video/')
+    .constant('originExpression', /^https?:\/\/player.vimeo.com/)
+    .directive('vimeoPlayer', [
       'ngVimeoConfig',
       '$window',
       '$timeout',

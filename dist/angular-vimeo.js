@@ -1,8 +1,8 @@
 /*!
- * angular-vimeo
+ * angular-vimeo-player
  * Philip Knape <philip.knape@gmail.com>
  * 
- * Version:  - 2015-11-16T13:28:15.697Z
+ * Version:  - 2015-11-17T16:56:01.135Z
  * License: ISC
  */
 
@@ -29,7 +29,9 @@
       method: {},
       event: {}
     })
-    .directive('vimeo', [
+    .constant('playerBaseURI', 'https://player.vimeo.com/video/')
+    .constant('originExpression', /^https?:\/\/player.vimeo.com/)
+    .directive('vimeoPlayer', [
       'ngVimeoConfig',
       '$window',
       '$timeout',
