@@ -2,7 +2,7 @@
  * angular-vimeo-player
  * Philip Knape <philip.knape@gmail.com>
  * 
- * Version:  - 2015-11-17T16:56:01.135Z
+ * Version:  - 2015-11-25T20:28:53.434Z
  * License: ISC
  */
 
@@ -11,20 +11,15 @@
   'use strict';
 
   angular
-    .module('ngVimeo', [])
-    /*.config(['$sce', function($sce) {
-      $sce.getTrustedResourceUrl('http://player.vimeo.com/video/*');
-    }])*/
-    .factory('VimeoService', function ($http) {
-      var endpoint = 'https://www.vimeo.com/api/oembed.json';
-      return {
-        oEmbed: function (params) {
-          return $http.jsonp(endpoint, {params: params}).then(function(res) {
-            return res.data;
-          });
-        }
-      };
-    })
+    .module('ngVimeo', [
+      'ngSanitize'
+    ])
+    .config(['$sceDelegateProvider', function($sceDelegateProvider) {
+      $sceDelegateProvider.resourceUrlWhitelist([
+        'self',
+        'http://player.vimeo.com/video/*'
+      ]);
+    }])
     .constant('ngVimeoConfig', {
       method: {},
       event: {}
@@ -36,9 +31,9 @@
       '$window',
       '$timeout',
       '$compile',
-      function(ngVimeoConfig, $window, $timeout, $compile) {
+    function(ngVimeoConfig, $window, $timeout, $compile) {
 
-        var vimeoEventList = [
+      var vimeoEventList = [
         'loadProgress',
         'playProgress',
         'play',
@@ -67,6 +62,21 @@
         'addEventListener' //addEventListener(event:String, listener:String):void
       ];
 
+      var vimeoWrapperCss = {
+        'position': 'relative',
+        'padding-bottom': '56.25%',
+        'padding-top': '25px',
+        'height': 0
+      };
+
+      var iframeCss = {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%'
+      };
+
       return {
         restrict: 'E',
         replace: true,
@@ -78,7 +88,8 @@
           type: '@',
           width: '@',
           height: '@',
-          options: '@'
+          options: '@',
+          responsive: '@'
         },
         link: function(scope, element, attrs) {
 
@@ -101,13 +112,23 @@
             }, scope.settings);
           }
 
-          function buildIframe(opt) {
-            opt.src = 'https://player.vimeo.com/video/' + opt.src
+          function buildStyle(cssObject, responsive) {
+            if (!responsive) {
+              return '';
+            }
+            var css = Object.keys(cssObject).map(function(key) {
+              return key + ':' + cssObject[key] + ';';
+            }).join(' ');
+            return ' style="' + css + '" ';
+          }
+
+          function buildIframe(opt, iframeStyle, wrapperStyle) {
+            opt.src = 'https://player.vimeo.com/video/' + opt.src;
             var iframeOptions = ['id', 'src'];
             var vimeoSettings = iframeOptions.map(function(val, index) {
               return val + '="' + opt[val] + '"';
             }).join(' ');
-            return  '<iframe ' + vimeoSettings + '></iframe>';
+            return  '<div ' + wrapperStyle + '><iframe ' + iframeStyle + vimeoSettings + '></iframe></div>';
           }
 
           function initFromMethod() {
@@ -153,7 +174,7 @@
 
             $timeout(function() {
               //add the video to the iframe;
-              element.html(buildIframe(options));
+              element.html(buildIframe(options, buildStyle(iframeCss, options.responsive), buildStyle(vimeoWrapperCss, options.responsive)));
               vimeoVideo = $compile(element.contents())(scope);
             }, 0);
 
@@ -194,7 +215,7 @@
             }
 
             if (typeof options.event[data.event] === 'function') {
-              return options.event[data.event]();
+              return options.event[data.event](event);
             }
           }
 
@@ -206,7 +227,7 @@
               data.value = value;
             }
             var message = JSON.stringify(data);
-            vimeoVideo[0].contentWindow.postMessage(message, playerOrigin);
+            vimeoVideo.find('iframe')[0].contentWindow.postMessage(message, playerOrigin);
           }
 
           function attachDetachListeners(methods, type) {
