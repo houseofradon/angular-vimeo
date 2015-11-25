@@ -31,7 +31,10 @@ angular
           console.log('done');
           console.log(arguments);
         },
-
+        seek: function() {
+          console.log('seek');
+          console.log(arguments);
+        }
       }
     }
 

@@ -2,7 +2,7 @@
  * angular-vimeo-player
  * Philip Knape <philip.knape@gmail.com>
  * 
- * Version:  - 2015-11-25T20:28:53.434Z
+ * Version:  - 2015-11-25T20:57:41.948Z
  * License: ISC
  */
 
@@ -65,7 +65,6 @@
       var vimeoWrapperCss = {
         'position': 'relative',
         'padding-bottom': '56.25%',
-        'padding-top': '25px',
         'height': 0
       };
 
@@ -112,12 +111,17 @@
             }, scope.settings);
           }
 
-          function buildStyle(cssObject, responsive) {
+          function buildStyle(cssObject, responsive, isWrapper) {
             if (!responsive) {
               return '';
             }
             var css = Object.keys(cssObject).map(function(key) {
-              return key + ':' + cssObject[key] + ';';
+
+              var val = (typeof responsive === 'string' && key === 'padding-bottom') ?
+                        responsive :
+                        cssObject[key];
+
+              return key + ':' + val + ';';
             }).join(' ');
             return ' style="' + css + '" ';
           }
@@ -174,19 +178,22 @@
 
             $timeout(function() {
               //add the video to the iframe;
-              element.html(buildIframe(options, buildStyle(iframeCss, options.responsive), buildStyle(vimeoWrapperCss, options.responsive)));
+              element.html(buildIframe(
+                options,
+                buildStyle(iframeCss, options.responsive, true),
+                buildStyle(vimeoWrapperCss, options.responsive, false)
+              ));
               vimeoVideo = $compile(element.contents())(scope);
             }, 0);
 
-            if (options.resize) {
+
+            if (typeof options.event.resize === 'function') {
               var debounce = false;
               if (debounce !== false) {
                 $timeout.cancel(debounce);
               }
               debounce = $timeout(function() {
-                $window.on('resize', function() {
-                  console.log('resize');
-                }, 200);
+                return $window.on('resize', options.event.resize, 200);
               });
             }
 
