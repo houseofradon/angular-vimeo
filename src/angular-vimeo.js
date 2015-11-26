@@ -119,11 +119,13 @@
 
           function buildIframe(opt, iframeStyle, wrapperStyle) {
             opt.src = 'https://player.vimeo.com/video/' + opt.src;
-            var iframeOptions = ['id', 'src'];
-            var vimeoSettings = iframeOptions.map(function(val, index) {
+            var iframeOptions = ['id', 'src', 'width', 'height', 'frameborder', ];
+            var vimeoSettings = iframeOptions.filter(function(val) {
+              return opt[val];
+            }).map(function(val, index) {
               return val + '="' + opt[val] + '"';
             }).join(' ');
-            return  '<div ' + wrapperStyle + '><iframe ' + iframeStyle + vimeoSettings + '></iframe></div>';
+            return  '<div ' + wrapperStyle + '><iframe ' + iframeStyle + vimeoSettings + 'webkitallowfullscreen mozallowfullscreen allowfullscreen ></iframe></div>';
           }
 
           function initFromMethod() {
@@ -142,11 +144,11 @@
             if (!vimeoVideo) {
               return;
             }
-
             attachDetachListeners(vimeoEventList, 'removeEventListener');
             $window.removeEventListener('message', onMessageReceived, false);
             vimeoElement.removeChild(vimeoVideo[0]);
             angular.element(element).css('display', 'none');
+            setMethods();
             vimeoVideo = null;
           }
 
@@ -213,7 +215,9 @@
             }
 
             if (typeof options.event[data.event] === 'function') {
-              return options.event[data.event](event);
+              return options.event[data.event].apply(null, Object.keys(data).map(function(key) {
+                return data[key];
+              }));
             }
           }
 
@@ -237,15 +241,21 @@
           function setMethods(methods) {
 
             scope.internalControl = methods || {};
+            if (!methods) {
+              return;
+            }
 
             // Method
             vimeoMethodList.forEach(function (value) {
               scope.internalControl[value] = function() {
-
+                // Better way of unbinding the functions?
+                if (!scope.internalControl[value]) {
+                  return
+                }
                 var args;
                 args = Array.prototype.slice.call(arguments);
                 args.unshift(value);
-                post(value);
+                post.apply(null, args);
 
               };
             });
