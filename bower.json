@@ -1,10 +1,11 @@
 {
   "name": "angular-vimeo-player",
   "description": "",
+  "version": "0.2.0",
   "authors": [
     "Philip Knape <philip.knape@gmail.com>"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "main": [
     "dist/angular-vimeo.js",
     "bower.json"
