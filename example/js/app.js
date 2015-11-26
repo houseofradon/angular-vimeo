@@ -15,8 +15,7 @@ angular
   .controller('VimeoController', function($scope, $timeout) {
 
     $scope.vimeoSettings = {
-      haltInit: true,
-      src: '76979871',
+      videoId: '20687326',
       method: {},
       event: {
         play: function() {
