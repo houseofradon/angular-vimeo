@@ -2,8 +2,8 @@
  * angular-vimeo-player
  * Philip Knape <philip.knape@gmail.com>
  * 
- * Version:  - 2015-11-26T09:57:58.605Z
- * License: ISC
+ * Version: 0.2.0 - 2015-11-26T23:22:51.399Z
+ * License: MIT
  */
 
 
@@ -62,6 +62,17 @@
         'addEventListener' //addEventListener(event:String, listener:String):void
       ];
 
+      var params = [
+        'autopause',
+        'autoplay',
+        'badge',
+        'byline',
+        'color',
+        'loop',
+        'portrait',
+        'title'
+      ]
+
       var vimeoWrapperCss = {
         'position': 'relative',
         'padding-bottom': '56.25%',
@@ -77,21 +88,19 @@
       };
 
       return {
-        restrict: 'E',
+        restrict: 'EA',
         replace: true,
         template: '<div></div>',
         scope: {
           settings: '=',
           iframeId: '@',
-          url: '@',
-          type: '@',
+          videoId: '@',
           width: '@',
           height: '@',
-          options: '@',
+          haltinit: '@',
           responsive: '@'
         },
         link: function(scope, element, attrs) {
-
 
           var vimeoElement = angular.element(element)[0];
           angular.element(element).css('display', 'none');
@@ -102,12 +111,12 @@
           function initOptions() {
            options = angular.extend(angular.copy(ngVimeoConfig), {
               responsive: scope.responsive || true,
-              id: scope.id || 'vimeoPlayer',
-              src: scope.src,
-              type: scope.type || 'js',
+              videoId: scope.videoId,
+              iframeId: scope.iframeId || 'vimeoPlayer',
+              haltInit: scope.haltinit,
               width: scope.width,
               height: scope.height,
-              options: scope.options,
+              playerId: scope.playerId || 1,
             }, scope.settings);
           }
 
@@ -126,15 +135,26 @@
             return ' style="' + css + '" ';
           }
 
-          function buildIframe(opt, iframeStyle, wrapperStyle) {
-            opt.src = 'https://player.vimeo.com/video/' + opt.src;
-            var iframeOptions = ['id', 'src', 'width', 'height', 'frameborder', ];
-            var vimeoSettings = iframeOptions.filter(function(val) {
+          function buildParams(values, opt, joiner, group) {
+            var g = group ? '"' : '';
+            return values.filter(function(val) {
               return opt[val];
-            }).map(function(val, index) {
-              return val + '="' + opt[val] + '"';
-            }).join(' ');
-            return  '<div ' + wrapperStyle + '><iframe ' + iframeStyle + vimeoSettings + 'webkitallowfullscreen mozallowfullscreen allowfullscreen ></iframe></div>';
+            }).map(function(val) {
+              return val + '=' + g + opt[val] + g;
+            }).join(joiner);
+          }
+
+          function buildPlayer(opt, p) {
+            var src = 'src="https://player.vimeo.com/video/' + opt.videoId;
+            var params = buildParams(p, opt, '&', false);
+            return src + '?' + params + 'api=1&player_id=' + opt.playerId + '" ';
+          }
+
+          function buildIframe(opt, iframeStyle, wrapperStyle) {
+            var src = buildPlayer(opt, params);
+            var iframeOptions = ['id', 'width', 'height', 'frameborder'];
+            var vimeoSettings = buildParams(iframeOptions, opt, ' ', true);
+            return  '<div ' + wrapperStyle + '><iframe ' + iframeStyle + src + vimeoSettings + '></iframe></div>';
           }
 
           function initFromMethod() {
@@ -164,13 +184,12 @@
           function init(manualInit) {
 
             initOptions();
-
+            options.method.setup = initFromMethod;
             if (options.haltInit && !manualInit) {
-              options.method.setup = initFromMethod;
               return;
             }
 
-            if (!options.src) {
+            if (!options.videoId) {
               console.warn('you need to supply a vimeo src');
               return;
             }
@@ -204,7 +223,6 @@
 
             // Lets add the global eventlitsener
             $window.addEventListener('message', onMessageReceived, false);
-
           }
 
           function onMessageReceived(event) {
@@ -223,8 +241,9 @@
               attachDetachListeners(vimeoEventList, 'addEventListener');
             }
 
-            if (typeof options.event[data.event] === 'function') {
-              return options.event[data.event].apply(null, Object.keys(data).map(function(key) {
+            if (typeof options.event[data.event] === 'function' &&
+                data.player_id === options.playerId) {
+                  return options.event[data.event].apply(null, Object.keys(data).map(function(key) {
                 return data[key];
               }));
             }
@@ -265,7 +284,6 @@
                 args = Array.prototype.slice.call(arguments);
                 args.unshift(value);
                 post.apply(null, args);
-
               };
             });
 
@@ -280,6 +298,8 @@
               return destroyAndInit();
             }
           }, true);
+
+          //destroyAndInit();
 
         }
       };
