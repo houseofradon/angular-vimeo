@@ -79,21 +79,19 @@
       };
 
       return {
-        restrict: 'E',
+        restrict: 'EA',
         replace: true,
         template: '<div></div>',
         scope: {
           settings: '=',
           iframeId: '@',
-          url: '@',
-          type: '@',
+          videoId: '@',
           width: '@',
           height: '@',
-          options: '@',
+          haltinit: '@',
           responsive: '@'
         },
         link: function(scope, element, attrs) {
-
 
           var vimeoElement = angular.element(element)[0];
           angular.element(element).css('display', 'none');
@@ -104,12 +102,12 @@
           function initOptions() {
            options = angular.extend(angular.copy(ngVimeoConfig), {
               responsive: scope.responsive || true,
-              id: scope.id || 'vimeoPlayer',
-              src: scope.src,
-              type: scope.type || 'js',
+              videoId: scope.videoId,
+              iframeId: scope.iframeId || 'vimeoPlayer',
+              haltInit: scope.haltinit,
               width: scope.width,
               height: scope.height,
-              options: scope.options,
+              playerId: scope.playerId || 1,
             }, scope.settings);
           }
 
@@ -178,13 +176,12 @@
           function init(manualInit) {
 
             initOptions();
-
+            options.method.setup = initFromMethod;
             if (options.haltInit && !manualInit) {
-              options.method.setup = initFromMethod;
               return;
             }
 
-            if (!options.src) {
+            if (!options.videoId) {
               console.warn('you need to supply a vimeo src');
               return;
             }
