@@ -53,6 +53,17 @@
         'addEventListener' //addEventListener(event:String, listener:String):void
       ];
 
+      var params = [
+        'autopause',
+        'autoplay',
+        'badge',
+        'byline',
+        'color',
+        'loop',
+        'portrait',
+        'title'
+      ]
+
       var vimeoWrapperCss = {
         'position': 'relative',
         'padding-bottom': '56.25%',
@@ -117,15 +128,27 @@
             return ' style="' + css + '" ';
           }
 
-          function buildIframe(opt, iframeStyle, wrapperStyle) {
-            opt.src = 'https://player.vimeo.com/video/' + opt.src;
-            var iframeOptions = ['id', 'src', 'width', 'height', 'frameborder', ];
-            var vimeoSettings = iframeOptions.filter(function(val) {
+          function buildParams(values, opt, joiner, group) {
+            var g = group ? '"' : '';
+            return values.filter(function(val) {
               return opt[val];
-            }).map(function(val, index) {
-              return val + '="' + opt[val] + '"';
-            }).join(' ');
-            return  '<div ' + wrapperStyle + '><iframe ' + iframeStyle + vimeoSettings + 'webkitallowfullscreen mozallowfullscreen allowfullscreen ></iframe></div>';
+            }).map(function(val) {
+              return val + '=' + g + opt[val] + g;
+            }).join(joiner);
+          }
+
+          function buildPlayer(opt, p) {
+            var src = 'src="https://player.vimeo.com/video/' + opt.videoId;
+            var params = buildParams(p, opt, '&', false);
+            return src + '?' + params + 'api=1&player_id=' + opt.playerId + '" ';
+          }
+
+          function buildIframe(opt, iframeStyle, wrapperStyle) {
+            var src = buildPlayer(opt, params);
+            var iframeOptions = ['id', 'width', 'height', 'frameborder'];
+
+            var vimeoSettings = buildParams(iframeOptions, opt, ' ', true);
+            return  '<div ' + wrapperStyle + '><iframe ' + iframeStyle + src + vimeoSettings + '></iframe></div>';
           }
 
           function initFromMethod() {
