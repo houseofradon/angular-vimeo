@@ -234,8 +234,9 @@
               attachDetachListeners(vimeoEventList, 'addEventListener');
             }
 
-            if (typeof options.event[data.event] === 'function') {
-              return options.event[data.event].apply(null, Object.keys(data).map(function(key) {
+            if (typeof options.event[data.event] === 'function' &&
+                data.player_id === options.playerId) {
+                  return options.event[data.event].apply(null, Object.keys(data).map(function(key) {
                 return data[key];
               }));
             }
