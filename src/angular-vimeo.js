@@ -17,7 +17,7 @@
     })
     .constant('playerBaseURI', 'https://player.vimeo.com/video/')
     .constant('originExpression', /^https?:\/\/player.vimeo.com/)
-    .directive('vimeoPlayer', [
+    .directive('vimeo', [
       'ngVimeoConfig',
       '$window',
       '$timeout',
@@ -138,7 +138,8 @@
           function buildPlayer(opt, p) {
             var src = 'src="https://player.vimeo.com/video/' + opt.videoId;
             var params = buildParams(p, opt, '&', false);
-            return src + '?' + params + 'api=1&player_id=' + opt.playerId + '" ';
+
+            return src + '?' + params + (params ? '&' : '') + 'api=1&player_id=' + opt.playerId + '" ';
           }
 
           function buildIframe(opt, iframeStyle, wrapperStyle) {
@@ -188,7 +189,6 @@
 
             options.method.destroy = destroy;
             angular.element(element).css('display', 'block');
-
             $timeout(function() {
               //add the video to the iframe;
               element.html(buildIframe(
