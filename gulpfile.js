@@ -1,6 +1,5 @@
 var fs = require('fs');
 var gulp = require('gulp');
-var karma = require('karma').server;
 var concat = require('gulp-concat');
 var jshint = require('gulp-jshint');
 var header = require('gulp-header');
@@ -14,6 +13,9 @@ var minifyCSS = require('gulp-minify-css');
 var templateCache = require('gulp-angular-templatecache');
 var gutil = require('gulp-util');
 var plumber = require('gulp-plumber');
+var isTravis = process.env.TRAVIS || false;
+
+var karma = require('karma').server;
 
 var config = {
     pkg: JSON.parse(fs.readFileSync('./bower.json')),
