@@ -2,7 +2,7 @@
  * angular-vimeo-player
  * Philip Knape <philip.knape@gmail.com>
  * 
- * Version: 0.2.0 - 2015-11-26T23:22:51.399Z
+ * Version: 0.3.0 - 2017-01-21T20:58:00.868Z
  * License: MIT
  */
 
@@ -26,7 +26,7 @@
     })
     .constant('playerBaseURI', 'https://player.vimeo.com/video/')
     .constant('originExpression', /^https?:\/\/player.vimeo.com/)
-    .directive('vimeoPlayer', [
+    .directive('vimeo', [
       'ngVimeoConfig',
       '$window',
       '$timeout',
@@ -147,12 +147,14 @@
           function buildPlayer(opt, p) {
             var src = 'src="https://player.vimeo.com/video/' + opt.videoId;
             var params = buildParams(p, opt, '&', false);
-            return src + '?' + params + 'api=1&player_id=' + opt.playerId + '" ';
+
+            return src + '?' + params + (params ? '&' : '') + 'api=1&player_id=' + opt.playerId + '" ';
           }
 
           function buildIframe(opt, iframeStyle, wrapperStyle) {
             var src = buildPlayer(opt, params);
             var iframeOptions = ['id', 'width', 'height', 'frameborder'];
+
             var vimeoSettings = buildParams(iframeOptions, opt, ' ', true);
             return  '<div ' + wrapperStyle + '><iframe ' + iframeStyle + src + vimeoSettings + '></iframe></div>';
           }
@@ -196,7 +198,6 @@
 
             options.method.destroy = destroy;
             angular.element(element).css('display', 'block');
-
             $timeout(function() {
               //add the video to the iframe;
               element.html(buildIframe(
@@ -223,6 +224,7 @@
 
             // Lets add the global eventlitsener
             $window.addEventListener('message', onMessageReceived, false);
+
           }
 
           function onMessageReceived(event) {
@@ -284,6 +286,7 @@
                 args = Array.prototype.slice.call(arguments);
                 args.unshift(value);
                 post.apply(null, args);
+
               };
             });
 
@@ -298,8 +301,6 @@
               return destroyAndInit();
             }
           }, true);
-
-          //destroyAndInit();
 
         }
       };
