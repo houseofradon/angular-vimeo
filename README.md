@@ -11,7 +11,7 @@ Please visit: [http://houseofradon.github.io/angular-vimeo/](http://houseofradon
 Installation
 -----
 
-- Using [bower](http://bower.io/) to install it. 
+- Using [bower](http://bower.io/) to install it.
 
 `bower install angular-vimeo-player`
 
@@ -90,7 +90,7 @@ Specify the height of the iFrame
 * **value:** ```boolean``` or ```string```
 * **default value:** ```true```
 
-Specify if the player should be responsive by default, fallbacks to standard 16:9 if set to true. Pass a procentage string to specify specfic dimention. 
+Specify if the player should be responsive by default, fallbacks to standard 16:9 if set to true. Pass a procentage string to specify specfic dimention.
 
 ### `playerId`
 * **required:** ```false```
