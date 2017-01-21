@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+  - "6.0"
+before_script:
+  - npm install -g bower
+  - npm install -g gulp
+  - npm install phantomjs
+  - npm install -g karma
+  - bower install
+  - gulp build
