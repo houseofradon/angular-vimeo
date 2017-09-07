@@ -58,7 +58,7 @@ $scope.vimeoConfig = {
 ## Attributes ##
 
 ### `videoId`
-* **value:** ```string```
+* **required:** ```true```
 * **value:** ```string```
 * **default value:** ```null```
 
