@@ -89,7 +89,8 @@
           width: '@',
           height: '@',
           haltinit: '@',
-          responsive: '@'
+          responsive: '@',
+          playerId: '@',
         },
         link: function(scope, element, attrs) {
 
@@ -107,7 +108,7 @@
               haltInit: scope.haltinit,
               width: scope.width,
               height: scope.height,
-              playerId: scope.playerId || 1,
+              playerId: scope.playerId || 'angular-vimeo',
             }, scope.settings);
           }
 
