@@ -2,7 +2,6 @@
  * angular-vimeo-player
  * Philip Knape <philip.knape@gmail.com>
  * 
- * Version: 0.3.1 - 2017-09-07T12:55:11.781Z
  * License: MIT
  */
 

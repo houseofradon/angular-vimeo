@@ -23,7 +23,6 @@ var config = {
     ' * <%= pkg.name %>\n' +
     ' * <%= pkg.authors %>\n' +
     ' * <%= pkg.homepage %>\n' +
-    ' * Version: <%= pkg.version %> - <%= timestamp %>\n' +
     ' * License: <%= pkg.license %>\n' +
     ' */\n\n\n'
 };
