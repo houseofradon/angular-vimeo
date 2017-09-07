@@ -73,14 +73,14 @@ Specify the id of the iFrame
 
 ### `width`
 * **required:** ```false```
-* **value:** ```boolean```
+* **value:** ```number```
 * **default value:** ```undefined```
 
 Specify the width of the iFrame
 
 ### `height`
 * **required:** ```false```
-* **value:** ```boolean```
+* **value:** ```number```
 * **default value:** ```undefined```
 
 Specify the height of the iFrame
