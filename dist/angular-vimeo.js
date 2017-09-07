@@ -2,7 +2,7 @@
  * angular-vimeo-player
  * Philip Knape <philip.knape@gmail.com>
  * 
- * Version: 0.3.1 - 2017-01-21T22:23:26.190Z
+ * Version: 0.3.1 - 2017-09-07T12:55:11.781Z
  * License: MIT
  */
 
@@ -98,7 +98,8 @@
           width: '@',
           height: '@',
           haltinit: '@',
-          responsive: '@'
+          responsive: '@',
+          playerId: '@',
         },
         link: function(scope, element, attrs) {
 
@@ -116,7 +117,7 @@
               haltInit: scope.haltinit,
               width: scope.width,
               height: scope.height,
-              playerId: scope.playerId || 1,
+              playerId: scope.playerId || 'angular-vimeo',
             }, scope.settings);
           }
 
