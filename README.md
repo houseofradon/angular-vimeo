@@ -99,6 +99,13 @@ Specify if the player should be responsive by default, fallbacks to standard 16:
 
 A unique name where the video can be identified. Use this if you are using more then one vimeo player on the page and want to use methods or events.
 
+### `fullscreen`
+* **required:** ```false```
+* **value:** ```boolean```
+* **default value:** ```undefined```
+
+Enable the fullscreen button on the embed player
+
 ## Method ##
 1. All the functions in the plugin are exposed through a control
 attribute.
