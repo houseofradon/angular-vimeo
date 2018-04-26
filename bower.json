@@ -1,22 +1,12 @@
 {
   "name": "angular-vimeo-player",
   "description": "",
-  "version": "0.3.2",
-  "authors": [
-    "Philip Knape <philip.knape@gmail.com>"
-  ],
+  "version": "0.4.0",
+  "authors": ["Philip Knape <philip.knape@gmail.com>"],
   "license": "MIT",
-  "main": [
-    "dist/angular-vimeo.min.js",
-    "bower.json"
-  ],
-  "ignore": [
-    "app"
-  ],
-  "keywords": [
-    "angular",
-    "vimeo"
-  ],
+  "main": ["dist/angular-vimeo.min.js", "bower.json"],
+  "ignore": ["app"],
+  "keywords": ["angular", "vimeo"],
   "dependencies": {
     "angular": "~1.4.0",
     "angular-sanitize": "~1.4.0"
@@ -27,11 +17,5 @@
   },
   "moduleType": [],
   "homepage": "",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ]
+  "ignore": ["**/.*", "node_modules", "bower_components", "test", "tests"]
 }
