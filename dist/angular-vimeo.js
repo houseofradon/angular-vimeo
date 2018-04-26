@@ -99,6 +99,7 @@
           haltinit: '@',
           responsive: '@',
           playerId: '@',
+          fullscreen: '=',
         },
         link: function(scope, element, attrs) {
 
@@ -116,6 +117,7 @@
               haltInit: scope.haltinit,
               width: scope.width,
               height: scope.height,
+              fullscreen: scope.fullscreen,
               playerId: scope.playerId || 'angular-vimeo',
             }, scope.settings);
           }
@@ -154,9 +156,10 @@
           function buildIframe(opt, iframeStyle, wrapperStyle) {
             var src = buildPlayer(opt, params);
             var iframeOptions = ['id', 'width', 'height', 'frameborder'];
+            var fullscreen = opt.fullscreen ? ' webkitallowfullscreen mozallowfullscreen allowfullscreen ' : '';
 
             var vimeoSettings = buildParams(iframeOptions, opt, ' ', true);
-            return  '<div ' + wrapperStyle + '><iframe ' + iframeStyle + src + vimeoSettings + '></iframe></div>';
+            return  '<div ' + wrapperStyle + '><iframe ' + iframeStyle + src + vimeoSettings + fullscreen + '></iframe></div>';
           }
 
           function initFromMethod() {
