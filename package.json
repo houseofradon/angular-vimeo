@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "gulp test"
+    "test": "bower install && gulp test"
   },
   "author": "",
   "license": "ISC",
